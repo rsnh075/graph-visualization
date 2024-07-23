@@ -1,5 +1,6 @@
 // backend/server.js
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = 3000;
 
@@ -14,6 +15,8 @@ const graphData = {
         { name: "B-3", description: "This is a description of B-3", parent: "B" }
     ]
 };
+
+app.use(cors());
 
 app.get('/api/data', (req, res) => {
     res.json(graphData);
