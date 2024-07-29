@@ -33,67 +33,71 @@
   });
 
   const createGraph = () => {
-    if (!graphData.value) return;
-    
-    const data = graphData.value;
-    const margin = { top: 50, right: 0, bottom: 0, left: 50 };
-    const svgWidth = 600 + margin.left + margin.right;
-    const svgHeight = 600 + margin.top + margin.bottom;
+  if (!graphData.value) return;
 
-    const svg = d3.select("#graph").append("svg")
-      .attr("width", svgWidth)
-      .attr("height", svgHeight)
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  const data = graphData.value;
+  const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+  const width = 600;
+  const height = 400;
 
-    const root = d3.stratify<NodeData>()
-      .id((d: NodeData) => d.name)
-      .parentId((d: NodeData) => d.parent || null)(data);
+  const svg = d3.select("#graph").append("svg")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+    .attr("preserveAspectRatio", "xMinYMin meet");
 
-    const treeLayout = d3.tree<NodeData>().size([600, 400]);
-    treeLayout(root);
+  const g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    svg.selectAll('line')
-      .data(root.links())
-      .enter()
-      .append('line')
-      .attr('x1', d => String(d.source.x))
-      .attr('y1', d => String(d.source.y))
-      .attr('x2', d => String(d.target.x))
-      .attr('y2', d => String(d.target.y))
-      .attr('stroke', 'black');
+  const root = d3.stratify<NodeData>()
+    .id((d: NodeData) => d.name)
+    .parentId((d: NodeData) => d.parent || null)(data);
 
-    const squareSize = 100;
-    svg.selectAll('rect')
-      .data(root.descendants())
-      .enter()
-      .append('rect')
-      .attr('x', d => d.x ? d.x - squareSize / 2 : 0)
-      .attr('y', d => (d.y ?? 0) - squareSize / 2)
-      .attr('width', squareSize)
-      .attr('height', squareSize)
-      .attr('fill', 'aquamarine')
-      .on('click', (event, d) => {
-        selectedNode.value = d.data;
-      })
-      .on('mouseover', (event) => {
-        d3.select(event.target).attr('fill', 'lightblue');
-        d3.select(event.target).style('cursor', 'pointer');
-      })
-      .on('mouseout', (event) => {
-        d3.select(event.target).attr('fill', 'aquamarine');
-        d3.select(event.target).style('cursor', 'default');
-      });
+  const treeLayout = d3.tree<NodeData>().size([width, height]);
+  treeLayout(root);
 
-    svg.selectAll('text')
-      .data(root.descendants())
-      .enter()
-      .append('text')
-      .attr('x', d => String(d.x))
-      .attr('y', d => (d.y ?? 0) + 5)
-      .attr('text-anchor', 'middle')
-      .attr('dominant-baseline', 'middle')
-      .text(d => d.data.name);
-  };
+  g.selectAll('line')
+    .data(root.links())
+    .enter()
+    .append('line')
+    .attr('x1', d => String(d.source.x))
+    .attr('y1', d => String(d.source.y))
+    .attr('x2', d => String(d.target.x))
+    .attr('y2', d => String(d.target.y))
+    .attr('stroke', 'black');
+
+  const squareSize = 100;
+  g.selectAll('rect')
+    .data(root.descendants())
+    .enter()
+    .append('rect')
+    .attr('x', d => d.x ? d.x - squareSize / 2 : 0)
+    .attr('y', d => (d.y ?? 0) - squareSize / 2)
+    .attr('width', squareSize)
+    .attr('height', squareSize)
+    .attr('fill', 'aquamarine')
+    .on('click', (event, d) => {
+      selectedNode.value = d.data;
+    })
+    .on('mouseover', (event) => {
+      d3.select(event.target).attr('fill', 'lightblue');
+      d3.select(event.target).style('cursor', 'pointer');
+    })
+    .on('mouseout', (event) => {
+      d3.select(event.target).attr('fill', 'aquamarine');
+      d3.select(event.target).style('cursor', 'default');
+    });
+
+  g.selectAll('text')
+    .data(root.descendants())
+    .enter()
+    .append('text')
+    .attr('x', d => String(d.x))
+    .attr('y', d => (d.y ?? 0) + 5)
+    .attr('text-anchor', 'middle')
+    .attr('dominant-baseline', 'middle')
+    .text(d => d.data.name);
+};
 
   const deselectNode = () => {
     selectedNode.value = null;
@@ -106,7 +110,7 @@
     <div v-if="selectedNode" class="sidebar">
         <h2>{{ selectedNode.name }}</h2>
         <p>{{ selectedNode.description }}</p>
-        <button @click="deselectNode">Deselect</button>
+        <button class="btn-deselect" @click="deselectNode">Deselect</button>
     </div>
   </main>
 </template>
@@ -117,9 +121,14 @@
   left: 0;
   top: 0;
   width: 200px;
-  background: #f4f4f4;
+  background: #e57d7d;
   padding: 10px;
-  border-right: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
+}
+.btn-deselect {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background: #7d84e5;
+  border-radius: 5px;
+  cursor: pointer;
 }
 </style>

@@ -3,7 +3,27 @@
 ## Project Setup
 
 ```sh
-cd .\graph-visualization\frontend\
+install NodeJs ()
+```
+
+```sh
+mkdir yourproject
+```
+
+```sh
+cd yourproject
+```
+
+```sh
+Clone repo using web URL https://github.com/rsnh075/image_demo.git
+```
+
+```sh
+cd .\graph-visualization\backend\
+```
+
+```sh
+npm i
 ```
 
 ```sh
