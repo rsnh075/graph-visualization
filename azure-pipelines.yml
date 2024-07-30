@@ -1,0 +1,56 @@
+# Node.js with Vue
+# Build a Node.js project that uses Vue.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  nodeVersion: '20.x'
+  buildDir: 'dist'
+
+steps:
+# Install Node.js
+- task: NodeTool@0
+  inputs:
+    versionSpec: $(nodeVersion)
+  displayName: 'Install Node.js'
+
+# Install dependencies
+- script: |
+    npm install
+  displayName: 'Install npm packages'
+
+# Lint the code
+- script: |
+    npm run lint
+  displayName: 'Lint code'
+
+# Run tests
+- script: |
+    npm test
+  displayName: 'Run tests'
+
+# Build the project
+- script: |
+    npm run build
+  displayName: 'Build project'
+
+# Publish build artifacts
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(buildDir)'
+    ArtifactName: 'drop'
+  displayName: 'Publish build artifacts'
+
+# Deploy to Azure App Service
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'Azure subscription 1'
+    appName: 'DemoGraphVisualization'
+    package: '$(Build.ArtifactStagingDirectory)/drop'
+  displayName: 'Deploy to Azure App Service'
